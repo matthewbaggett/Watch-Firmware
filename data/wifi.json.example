@@ -1,0 +1,4 @@
+[
+    {"ssid": "ExampleWifi", "psk": "apassword"},
+    {"ssid": "DifferentWifi", "psk": "strongpassword"}
+]
