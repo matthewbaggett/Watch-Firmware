@@ -27,17 +27,15 @@ class WatchService : public sDOS_Abstract_Service
         };
 
         void loop(){
-            _debugger.Debug(_component, "loop begin");
             if(_bleh){
                 _bleh = false;
-                uint8_t r=255, g=0, b=0;
-                _frameBuffer->setAll(r, g, b);
+                _frameBuffer->setAll(255, 0, 0);
+                //_frameBuffer->drawLine(1, 1, DISPLAY_WIDTH-2, DISPLAY_HEIGHT-2, 0, 255, 0);
             }else{
                 _bleh = true;
                 uint8_t r=0, g=0, b=0;
                 _frameBuffer->setAll(r, g, b);
             }
-            _debugger.Debug(_component, "loop end");
         };
 
         String getName(){ return _component; };

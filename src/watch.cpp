@@ -1,4 +1,5 @@
 #include "watch.hpp"
+#define ENABLE_SERVICE_NTP
 
 Watch _timepiece;
 
