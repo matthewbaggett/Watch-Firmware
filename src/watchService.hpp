@@ -23,6 +23,8 @@ public:
 
     void setup() {
         _debugger.Debug(_component, "setup begin");
+        _frameBuffer->getDisplay()->setBacklight(255);
+        _frameBuffer->getDisplay()->setEnabled(true);
         _frameBuffer->setAll(0, 0, 255);
         _eventsManager.on(F("TTP223_down"), &WatchService::faciaButtonPressCallback);
         _debugger.Debug(_component, "setup over");
@@ -38,10 +40,14 @@ public:
     void touch() {
         if (_bleh) {
             _bleh = false;
+            _frameBuffer->getDisplay()->setBacklight(std::rand() % 155 + 100);
+            _frameBuffer->getDisplay()->setEnabled(true);
             _frameBuffer->setAll(255, 0, 0);
             _led->setBrightness(0);
         } else {
             _bleh = true;
+            _frameBuffer->getDisplay()->setBacklight(std::rand() % 155 + 100);
+            _frameBuffer->getDisplay()->setEnabled(true);
             _frameBuffer->setAll(0, 255, 0);
             _led->setBrightness(255);
         }
