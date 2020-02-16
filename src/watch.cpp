@@ -1,14 +1,13 @@
 #include "watch.hpp"
+
 #define ENABLE_SERVICE_NTP
 
 Watch _timepiece;
 
-void setup()
-{
+void setup() {
     _timepiece.Setup();
 }
 
-void loop()
-{
-   _timepiece.Loop();
+void loop() {
+    _timepiece.Loop();
 }
