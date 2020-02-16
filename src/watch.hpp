@@ -9,9 +9,15 @@ class Watch : public sDOS
             sDOS::Setup();
             
             _watchService = new WatchService(
-                _debugger, _events, _driver_RTC, 
-                _driver_WiFi, _driver_BT , _cpuScaler, 
-                _driver_FrameBuffer
+                _debugger,
+                _events,
+                _driver_RTC,
+                _driver_WiFi,
+                _driver_BT ,
+                _cpuScaler,
+                _driver_FrameBuffer,
+                _button_ttp223,
+                _mono_led
             );
             _debugger.Debug(_component, "just before watch service setup");
             _watchService->setup();
