@@ -44,6 +44,8 @@
 
 #define ENABLE_CPU_SCALER
 #define CPU_FREQ_ONDEMAND 240
+#define CPU_FREQ_MHZ 80
+#define CPU_FREQ_MHZ_NORADIO 10
 
 #define ENABLE_SERVICE_NTP
 
@@ -52,6 +54,7 @@
 
 #define ENABLE_MONOCOLOUR_LED GPIO_NUM_4
 
+#define DEBUG_EVENTS
 //#define DEBUG_LOOP_RUNNING
 
 #include <kern.hpp>
