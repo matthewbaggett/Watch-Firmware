@@ -5,3 +5,5 @@
 .vscode/ipch
 .vscode
 data/wifi.json
+/cmake-build-debug/
+/cmake-build-watch/
