@@ -5,8 +5,10 @@
 class Watch : public sDOS {
 public:
     void Setup() {
+        // Instantiate sDOS core.
         sDOS::Setup();
 
+        // Create our watch service
         _watchService = new WatchService(
                 _debugger,
                 _events,
@@ -18,11 +20,14 @@ public:
                 _button_ttp223,
                 _mono_led
         );
-        _debugger.Debug(_component, "just before watch service setup");
+
+        // Since we're too late for the setup now, we gotta run it outselves
         _watchService->setup();
-        _debugger.Debug(_component, "just before services.push_back");
-        _services.push_back(_watchService);
+
+        // Add our watchService to sDOS core. We can add drivers like this too.
+        sDOS::add(_watchService);
     };
+
 protected:
     WatchService *_watchService;
 };
