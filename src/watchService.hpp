@@ -40,7 +40,7 @@ public:
         _frameBuffer->getDisplay()->setEnabled(true);
 
         // Set the entire screen to solid black
-        _frameBuffer->setAll(0, 0, 0);
+        _frameBuffer->setAll(FB_BLACK);
 
         sDOS_FrameBuffer::Coordinate topLeft = sDOS_FrameBuffer::Coordinate(10,10);
         sDOS_FrameBuffer::Coordinate topRight = sDOS_FrameBuffer::Coordinate(DISPLAY_HEIGHT - 10, 10);
