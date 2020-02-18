@@ -61,7 +61,15 @@ public:
         _frameBuffer->drawLine(innerBottomRight, innerBottomLeft, FB_BLUE);
         _frameBuffer->drawLine(innerBottomLeft, innerTopLeft, FB_PINK);
 
+        // Setup events listeners
         _eventsManager.on(F("TTP223_down"), &WatchService::faciaButtonPressCallback);
+        _eventsManager.on(F("wifi_on"), &WatchService::wifiStateChangeOn);
+        _eventsManager.on(F("wifi_off"), &WatchService::wifiStateChangeOff);
+        _eventsManager.on(F("wifi_ip_set"), &WatchService::wifiStateGotIP);
+        _eventsManager.on(F("wifi_disconnect"), &WatchService::wifiStateDisconnected);
+        _eventsManager.on(F("rtc_interrupt"), &WatchService::rtcInterrupt);
+
+        // All done
         _debugger.Debug(_component, "setup over");
     };
 
@@ -69,6 +77,14 @@ public:
         if (WatchService::_faciaButtonPressed) {
             WatchService::_faciaButtonPressed = false;
             touch();
+        }
+        if(WatchService::_wifiStateHasChanged){
+            WatchService::_wifiStateHasChanged = false;
+            _debugger.Debug(_component, "Wifi State has changed ¯\\_(ツ)_/¯");
+        }
+        if(WatchService::_rtcInterruptFired){
+            WatchService::_rtcInterruptFired = false;
+            _debugger.Debug(_component, "RTC interrupt ¯\\_(ツ)_/¯");
         }
     };
 
@@ -99,9 +115,30 @@ public:
 
     bool isActive() { return true; };
 
-    static void faciaButtonPressCallback(String payload) {
+    static void faciaButtonPressCallback(const String& payload) {
         WatchService::_faciaButtonPressed = true;
     };
+
+    static void wifiStateChangeOn(const String& payload){
+        WatchService::_wifiIsOn = true;
+        WatchService::_wifiStateHasChanged = true;
+    }
+    static void wifiStateChangeOff(const String& payload){
+        WatchService::_wifiIsOn = false;
+        WatchService::_wifiStateHasChanged = true;
+    }
+    static void wifiStateGotIP(const String& payload){
+        WatchService::_wifiIp = payload;
+        WatchService::_wifiStateHasChanged = true;
+    }
+    static void wifiStateDisconnected(const String& payload){
+        WatchService::_wifiIp.clear();
+        WatchService::_wifiStateHasChanged = true;
+    }
+
+    static void rtcInterrupt(const String& payload){
+        WatchService::_rtcInterruptFired = true;
+    }
 
 private:
     String _component = "timepiece";
@@ -116,6 +153,14 @@ private:
     sDOS_LED_MONO *_led;
     bool _bleh = false;
     static bool _faciaButtonPressed;
+    static bool _wifiStateHasChanged;
+    static bool _wifiIsOn;
+    static String _wifiIp;
+    static bool _rtcInterruptFired;
 };
 
 bool WatchService::_faciaButtonPressed = false;
+bool WatchService::_wifiStateHasChanged = false;
+bool WatchService::_wifiIsOn = false;
+String WatchService::_wifiIp = "";
+bool WatchService::_rtcInterruptFired = false;
