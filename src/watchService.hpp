@@ -9,6 +9,7 @@
 #include <services/cpu_scaler.hpp>
 #include <drivers/display/frame_buffer.hpp>
 #include <stdlib.h>
+#include <string>
 
 #ifndef NTP_UPDATE_INTERVAL_SECONDS
 #define NTP_UPDATE_INTERVAL_SECONDS 60 * 60 * 12
@@ -16,11 +17,21 @@
 
 class WatchService : public sDOS_Abstract_Service {
 public:
-    WatchService(Debugger &debugger, EventsManager &eventsManager, AbstractRTC *rtc, WiFiManager *wifi,
+    WatchService(Debugger &debugger, EventsManager &eventsManager, sDOS_PCF8563 *rtc, WiFiManager *wifi,
                  BluetoothManager *bt, sDOS_CPU_SCALER *cpuScaler, sDOS_FrameBuffer *frameBuffer, sDOS_TTP223 *button,
                  sDOS_LED_MONO *led)
             : _debugger(debugger), _eventsManager(eventsManager), _rtc(rtc), _wifi(wifi), _bt(bt),
-              _cpuScaler(cpuScaler), _frameBuffer(frameBuffer), _button(button), _led(led) {};
+              _cpuScaler(cpuScaler), _frameBuffer(frameBuffer), _button(button), _led(led) {
+        // Setup events listeners
+        _eventsManager.on(F("TTP223_down"), &WatchService::faciaButtonPressCallback);
+        _eventsManager.on(F("wifi_on"), &WatchService::wifiStateChangeOn);
+        _eventsManager.on(F("wifi_off"), &WatchService::wifiStateChangeOff);
+        _eventsManager.on(F("wifi_ip_set"), &WatchService::wifiStateGotIP);
+        _eventsManager.on(F("wifi_disconnect"), &WatchService::wifiStateDisconnected);
+        _eventsManager.on(F("rtc_set"), &WatchService::rtcReady);
+        _eventsManager.on(F("rtc_interrupt"), &WatchService::rtcInterrupt);
+        _eventsManager.on(F("cpu_freq_mhz"), &WatchService::cpuFrequencyChange);
+    };
 
     void setup() {
         _debugger.Debug(_component, "setup begin");
@@ -61,14 +72,6 @@ public:
         _frameBuffer->drawLine(innerBottomRight, innerBottomLeft, FB_BLUE);
         _frameBuffer->drawLine(innerBottomLeft, innerTopLeft, FB_PINK);
 
-        // Setup events listeners
-        _eventsManager.on(F("TTP223_down"), &WatchService::faciaButtonPressCallback);
-        _eventsManager.on(F("wifi_on"), &WatchService::wifiStateChangeOn);
-        _eventsManager.on(F("wifi_off"), &WatchService::wifiStateChangeOff);
-        _eventsManager.on(F("wifi_ip_set"), &WatchService::wifiStateGotIP);
-        _eventsManager.on(F("wifi_disconnect"), &WatchService::wifiStateDisconnected);
-        _eventsManager.on(F("rtc_interrupt"), &WatchService::rtcInterrupt);
-
         // All done
         _debugger.Debug(_component, "setup over");
     };
@@ -82,9 +85,19 @@ public:
             WatchService::_wifiStateHasChanged = false;
             _debugger.Debug(_component, "Wifi State has changed ¯\\_(ツ)_/¯");
         }
+        if(WatchService::_rtcReadyFired){
+            WatchService::_rtcReadyFired = false;
+            _debugger.Debug(_component, "RTC ready ¯\\_(ツ)_/¯");
+            _rtc->setAlarmInMinutes(1);
+        }
         if(WatchService::_rtcInterruptFired){
             WatchService::_rtcInterruptFired = false;
             _debugger.Debug(_component, "RTC interrupt ¯\\_(ツ)_/¯");
+            _rtc->setAlarmInMinutes(1);
+        }
+        if(WatchService::_cpuFrequencyMhzInterruptFired){
+            WatchService::_cpuFrequencyMhzInterruptFired = false;
+            _debugger.Debug(_component, "CPU Frequency now %d", WatchService::_cpuFreqencyMhz);
         }
     };
 
@@ -135,16 +148,22 @@ public:
         WatchService::_wifiIp.clear();
         WatchService::_wifiStateHasChanged = true;
     }
-
+    static void rtcReady(const String& payload){
+        WatchService::_rtcReadyFired = true;
+    }
     static void rtcInterrupt(const String& payload){
         WatchService::_rtcInterruptFired = true;
+    }
+    static void cpuFrequencyChange(const String & payload){
+        WatchService::_cpuFreqencyMhz = strtol(payload.c_str(), nullptr, 10);
+        WatchService::_cpuFrequencyMhzInterruptFired = true;
     }
 
 private:
     String _component = "timepiece";
     Debugger _debugger;
     EventsManager _eventsManager;
-    AbstractRTC *_rtc;
+    sDOS_PCF8563 *_rtc;
     WiFiManager *_wifi;
     BluetoothManager *_bt;
     sDOS_CPU_SCALER *_cpuScaler;
@@ -156,11 +175,17 @@ private:
     static bool _wifiStateHasChanged;
     static bool _wifiIsOn;
     static String _wifiIp;
+    static bool _rtcReadyFired;
     static bool _rtcInterruptFired;
+    static unsigned int _cpuFreqencyMhz;
+    static bool _cpuFrequencyMhzInterruptFired;
 };
 
 bool WatchService::_faciaButtonPressed = false;
 bool WatchService::_wifiStateHasChanged = false;
 bool WatchService::_wifiIsOn = false;
 String WatchService::_wifiIp = "";
+bool WatchService::_rtcReadyFired = false;
 bool WatchService::_rtcInterruptFired = false;
+bool WatchService::_cpuFrequencyMhzInterruptFired = false;
+unsigned int WatchService::_cpuFreqencyMhz = 0;
