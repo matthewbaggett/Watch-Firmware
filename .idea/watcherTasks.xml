@@ -20,7 +20,7 @@
         </array>
       </option>
       <option name="outputFromStdout" value="false" />
-      <option name="program" value="/home/geusebio/.platformio/penv/bin/platformio" />
+      <option name="program" value="/home/geusebio/.platformio/penv/bin/pio" />
       <option name="scopeName" value="Project Files" />
       <option name="trackOnlyRoot" value="false" />
       <option name="workingDir" value="$PROJECT_DIR$" />

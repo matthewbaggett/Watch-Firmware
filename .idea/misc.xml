@@ -6,9 +6,8 @@
       <file path="$PROJECT_DIR$/src" />
     </sourceRoots>
     <libraryRoots>
-      <file path="$PROJECT_DIR$/.pio/libdeps" />
-      <file path="$PROJECT_DIR$/.pio/libdeps/TTGO_WATCH/Smol-Device-Operating-System" />
       <file path="$PROJECT_DIR$/lib" />
+      <file path="$PROJECT_DIR$/.pio/libdeps" />
     </libraryRoots>
     <excludeRoots>
       <file path="$PROJECT_DIR$/.pio" />
