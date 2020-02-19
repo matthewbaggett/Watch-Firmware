@@ -23,18 +23,18 @@ public:
             : _debugger(debugger), _eventsManager(eventsManager), _rtc(rtc), _wifi(wifi), _bt(bt),
               _cpuScaler(cpuScaler), _frameBuffer(frameBuffer), _button(button), _led(led) {
         // Setup events listeners
-        _eventsManager.on(F("TTP223_down"), &WatchService::faciaButtonPressCallback);
-        _eventsManager.on(F("wifi_on"), &WatchService::wifiStateChangeOn);
-        _eventsManager.on(F("wifi_off"), &WatchService::wifiStateChangeOff);
-        _eventsManager.on(F("wifi_ip_set"), &WatchService::wifiStateGotIP);
-        _eventsManager.on(F("wifi_disconnect"), &WatchService::wifiStateDisconnected);
-        _eventsManager.on(F("rtc_set"), &WatchService::rtcReady);
-        _eventsManager.on(F("rtc_interrupt"), &WatchService::rtcInterrupt);
-        _eventsManager.on(F("cpu_freq_mhz"), &WatchService::cpuFrequencyChange);
-        _eventsManager.on(F("power_state"), &WatchService::powerStateChange);
+        EventsManager::on(F("TTP223_down"), &WatchService::faciaButtonPressCallback);
+        EventsManager::on(F("wifi_on"), &WatchService::wifiStateChangeOn);
+        EventsManager::on(F("wifi_off"), &WatchService::wifiStateChangeOff);
+        EventsManager::on(F("wifi_ip_set"), &WatchService::wifiStateGotIP);
+        EventsManager::on(F("wifi_disconnect"), &WatchService::wifiStateDisconnected);
+        EventsManager::on(F("rtc_set"), &WatchService::rtcReady);
+        EventsManager::on(F("rtc_interrupt"), &WatchService::rtcInterrupt);
+        EventsManager::on(F("cpu_freq_mhz"), &WatchService::cpuFrequencyChange);
+        EventsManager::on(F("power_state"), &WatchService::powerStateChange);
     };
 
-    void setup() {
+    void setup() override {
         _debugger.Debug(_component, "setup begin");
         _led->setBrightness(0);
         _frameBuffer->getDisplay()->setBacklight(255);
@@ -77,7 +77,7 @@ public:
         _debugger.Debug(_component, "setup over");
     };
 
-    void loop() {
+    void loop() override {
         if (WatchService::_faciaButtonPressed) {
             WatchService::_faciaButtonPressed = false;
             touch();
@@ -105,7 +105,7 @@ public:
             if(WatchService::_isOnCharge){
                 if(!_hasActiveWifiRequest){
                     _wifi->addRequestActive();
-                    BluetoothManager::addRequest();
+                    //BluetoothManager::addRequest();
                     _hasActiveWifiRequest = true;
                 }
                 _debugger.Debug(_component, "I have been put on charge");
@@ -114,7 +114,7 @@ public:
                 _debugger.Debug(_component, "I have been taken off charge");
                 if(_hasActiveWifiRequest){
                     _wifi->removeRequestActive();
-                    BluetoothManager::removeRequest();
+                    //BluetoothManager::removeRequest();
                     _hasActiveWifiRequest = false;
                 }
             }
@@ -144,9 +144,9 @@ public:
         }
     };
 
-    String getName() { return _component; };
+    String getName() override { return _component; };
 
-    bool isActive() { return true; };
+    bool isActive() override { return true; };
 
     static void faciaButtonPressCallback(const String& payload) {
         WatchService::_faciaButtonPressed = true;
