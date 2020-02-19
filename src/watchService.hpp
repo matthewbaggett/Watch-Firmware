@@ -4,8 +4,8 @@
 #include <debugger.hpp>
 #include <events.hpp>
 #include <abstracts/rtc.hpp>
-#include <wifi.hpp>
-#include <bluetooth/bluetooth.hpp>
+#include <drivers/wifi.hpp>
+#include <drivers/bluetooth/bluetooth.hpp>
 #include <services/cpu_scaler.hpp>
 #include <drivers/display/frame_buffer.hpp>
 #include <stdlib.h>
@@ -31,6 +31,7 @@ public:
         _eventsManager.on(F("rtc_set"), &WatchService::rtcReady);
         _eventsManager.on(F("rtc_interrupt"), &WatchService::rtcInterrupt);
         _eventsManager.on(F("cpu_freq_mhz"), &WatchService::cpuFrequencyChange);
+        _eventsManager.on(F("power_state"), &WatchService::powerStateChange);
     };
 
     void setup() {
@@ -99,6 +100,25 @@ public:
             WatchService::_cpuFrequencyMhzInterruptFired = false;
             _debugger.Debug(_component, "CPU Frequency now %d", WatchService::_cpuFreqencyMhz);
         }
+        if(WatchService::_chargeStateChanged){
+            WatchService::_chargeStateChanged = false;
+            if(WatchService::_isOnCharge){
+                if(!_hasActiveWifiRequest){
+                    _wifi->addRequestActive();
+                    _bt->addRequested();
+                    _hasActiveWifiRequest = true;
+                }
+                _debugger.Debug(_component, "I have been put on charge");
+
+            }else{
+                _debugger.Debug(_component, "I have been taken off charge");
+                if(_hasActiveWifiRequest){
+                    _wifi->removeRequestActive();
+                    _bt->removeRequested();
+                    _hasActiveWifiRequest = false;
+                }
+            }
+        }
     };
 
     void touch() {
@@ -158,6 +178,10 @@ public:
         WatchService::_cpuFreqencyMhz = strtol(payload.c_str(), nullptr, 10);
         WatchService::_cpuFrequencyMhzInterruptFired = true;
     }
+    static void powerStateChange(const String & payload){
+        WatchService::_chargeStateChanged = true;
+        WatchService::_isOnCharge = payload == "charging" ? true : false;
+    }
 
 private:
     String _component = "timepiece";
@@ -179,6 +203,9 @@ private:
     static bool _rtcInterruptFired;
     static unsigned int _cpuFreqencyMhz;
     static bool _cpuFrequencyMhzInterruptFired;
+    static bool _chargeStateChanged;
+    static bool _isOnCharge;
+    bool _hasActiveWifiRequest = false;
 };
 
 bool WatchService::_faciaButtonPressed = false;
@@ -189,3 +216,5 @@ bool WatchService::_rtcReadyFired = false;
 bool WatchService::_rtcInterruptFired = false;
 bool WatchService::_cpuFrequencyMhzInterruptFired = false;
 unsigned int WatchService::_cpuFreqencyMhz = 0;
+bool WatchService::_chargeStateChanged = false;
+bool WatchService::_isOnCharge = false;
