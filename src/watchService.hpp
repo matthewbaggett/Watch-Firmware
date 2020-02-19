@@ -4,8 +4,8 @@
 #include <debugger.hpp>
 #include <events.hpp>
 #include <abstracts/rtc.hpp>
-#include <drivers/wifi.hpp>
-#include <drivers/bluetooth/bluetooth.hpp>
+#include <drivers/WiFiManager.hpp>
+#include <drivers/BluetoothManager.hpp>
 #include <services/cpu_scaler.hpp>
 #include <drivers/display/frame_buffer.hpp>
 #include <stdlib.h>
@@ -105,7 +105,7 @@ public:
             if(WatchService::_isOnCharge){
                 if(!_hasActiveWifiRequest){
                     _wifi->addRequestActive();
-                    _bt->addRequested();
+                    BluetoothManager::addRequest();
                     _hasActiveWifiRequest = true;
                 }
                 _debugger.Debug(_component, "I have been put on charge");
@@ -114,7 +114,7 @@ public:
                 _debugger.Debug(_component, "I have been taken off charge");
                 if(_hasActiveWifiRequest){
                     _wifi->removeRequestActive();
-                    _bt->removeRequested();
+                    BluetoothManager::removeRequest();
                     _hasActiveWifiRequest = false;
                 }
             }
