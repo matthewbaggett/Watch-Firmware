@@ -18,9 +18,9 @@
 class WatchService : public sDOS_Abstract_Service {
 public:
     WatchService(Debugger &debugger, EventsManager &eventsManager, sDOS_PCF8563 *rtc, WiFiManager *wifi,
-                 BluetoothManager *bt, sDOS_CPU_SCALER *cpuScaler, sDOS_FrameBuffer *frameBuffer, sDOS_TTP223 *button,
+                 BluetoothManager *bt, sDOS_OTA_Service *ota, sDOS_CPU_SCALER *cpuScaler, sDOS_FrameBuffer *frameBuffer, sDOS_TTP223 *button,
                  sDOS_LED_MONO *led)
-            : _debugger(debugger), _eventsManager(eventsManager), _rtc(rtc), _wifi(wifi), _bt(bt),
+            : _debugger(debugger), _eventsManager(eventsManager), _rtc(rtc), _wifi(wifi), _bt(bt), _ota(ota),
               _cpuScaler(cpuScaler), _frameBuffer(frameBuffer), _button(button), _led(led) {
         // Setup events listeners
         EventsManager::on(F("TTP223_down"), &WatchService::faciaButtonPressCallback);
@@ -105,6 +105,7 @@ public:
             if(WatchService::_isOnCharge){
                 if(!_hasActiveWifiRequest){
                     _wifi->addRequestActive();
+                    _ota->activate();
                     //BluetoothManager::addRequest();
                     _hasActiveWifiRequest = true;
                 }
@@ -113,6 +114,7 @@ public:
             }else{
                 _debugger.Debug(_component, "I have been taken off charge");
                 if(_hasActiveWifiRequest){
+                    _ota->deactivate();
                     _wifi->removeRequestActive();
                     //BluetoothManager::removeRequest();
                     _hasActiveWifiRequest = false;
@@ -190,6 +192,7 @@ private:
     sDOS_PCF8563 *_rtc;
     WiFiManager *_wifi;
     BluetoothManager *_bt;
+    sDOS_OTA_Service *_ota;
     sDOS_CPU_SCALER *_cpuScaler;
     sDOS_FrameBuffer *_frameBuffer;
     sDOS_TTP223 *_button;

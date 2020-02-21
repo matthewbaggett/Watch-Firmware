@@ -8,6 +8,9 @@ public:
         // Instantiate sDOS core.
         sDOS::Setup();
 
+        // Create OTA service instance
+        _ota = new sDOS_OTA_Service(_debugger, _events, _driver_WiFi, _cpuScaler);
+
         // Create our watch service
         _watchService = new WatchService(
                 _debugger,
@@ -15,6 +18,7 @@ public:
                 _driver_RTC,
                 _driver_WiFi,
                 _driver_BT,
+                _ota,
                 _cpuScaler,
                 _driver_FrameBuffer,
                 _button_ttp223,
@@ -24,10 +28,12 @@ public:
         // Since we're too late for the setup now, we gotta run it outselves
         _watchService->setup();
 
-        // Add our watchService to sDOS core. We can add drivers like this too.
+        // Add our watchService et al to sDOS core. We can add drivers like this too.
+        sDOS::add(_ota);
         sDOS::add(_watchService);
     };
 
 protected:
     WatchService *_watchService;
+    sDOS_OTA_Service * _ota;
 };

@@ -8,6 +8,8 @@ build:
 	platformio run --environment watch
 program:
 	platformio run --environment watch --jobs 1 --target upload
+program-ota:
+	platformio run --environment watch --jobs 1 --upload-port 192.168.43.178 --target upload
 monitor:
 	platformio run --environment watch --jobs 1 --target monitor
 watch: build program monitor
