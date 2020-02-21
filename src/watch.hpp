@@ -25,7 +25,7 @@ public:
                 _mono_led
         );
 
-        // Since we're too late for the setup now, we gotta run it outselves
+        // Since we're too late for the setup now, we gotta run it ourselves
         _watchService->setup();
 
         // Add our watchService et al to sDOS core. We can add drivers like this too.
