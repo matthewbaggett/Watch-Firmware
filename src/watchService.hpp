@@ -9,7 +9,8 @@
 #include <services/cpu_scaler.hpp>
 #include <drivers/display/frame_buffer.hpp>
 #include <drivers/display/fonts/FreeMonoBold24pt7b.h>
-#include <stdlib.h>
+#include <drivers/display/fonts/Picopixel.h>
+#include <cstdlib>
 #include <string>
 
 #ifndef NTP_UPDATE_INTERVAL_SECONDS
@@ -50,7 +51,8 @@ public:
         // Allow Debugging with bluetooth UART
         //BluetoothManager::addRequest();
 
-        _frameBuffer->drawText(10, 10, "Arse", &FreeMonoBold24pt7b, FB_WHITE);
+        _frameBuffer->drawText(0, 0 + 0, "18", &FreeMonoBold24pt7b, FB_WHITE);
+        _frameBuffer->drawText(0, 0 + FreeMonoBold24pt7b.yAdvance, "28", &FreeMonoBold24pt7b, FB_WHITE);
     };
 
 
@@ -107,14 +109,14 @@ public:
             _frameBuffer->getDisplay()->setEnabled(true);
             _frameBuffer->setAll(255, 0, 0);
             _led->setBrightness(0);
-            _frameBuffer->drawText(10, 10, "Fuck", &FreeMonoBold24pt7b, FB_GREEN);
+            _frameBuffer->drawText(10, 10, "Fuck", &Picopixel, FB_GREEN);
         } else {
             _bleh = true;
             _frameBuffer->getDisplay()->setBacklight(255);
             _frameBuffer->getDisplay()->setEnabled(true);
             _frameBuffer->setAll(0, 255, 0);
             _led->setBrightness(255);
-            _frameBuffer->drawText(10, 10, "Nugget", &FreeMonoBold24pt7b, FB_RED);
+            _frameBuffer->drawText(10, 10, "Nugget", &Picopixel, FB_RED);
         }
 
         for(uint i = 0; i <= rand()%15 + 5; i++){
