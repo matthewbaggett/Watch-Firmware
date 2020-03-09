@@ -41,20 +41,74 @@ public:
         _led->setBrightness(0);
         _frameBuffer->getDisplay()->setBacklight(255);
         _frameBuffer->getDisplay()->setEnabled(true);
-
-        // Set the entire screen to solid black
-        _frameBuffer->setAll(FB_BLACK);
+        _debugger.Debug(_component, "A-4");
+        paintTime();
+        paintTray();
 
         // All done
         _debugger.Debug(_component, "setup over");
 
         // Allow Debugging with bluetooth UART
         //BluetoothManager::addRequest();
-
-        _frameBuffer->drawText(0, 0 + 0, "18", &FreeMonoBold24pt7b, FB_WHITE);
-        _frameBuffer->drawText(0, 0 + FreeMonoBold24pt7b.yAdvance, "28", &FreeMonoBold24pt7b, FB_WHITE);
     };
 
+    void paintTime(){
+        sDOS_FrameBuffer::Colour background = FB_BLACK;
+        sDOS_FrameBuffer::Colour colour = FB_WHITE;
+        // Set the entire screen to solid black
+        _frameBuffer->fillEntireFrame(background);
+        GFXfont timeFont = FreeMonoBold24pt7b;
+
+        // Hour and minute as string
+        String hour = String(_rtc->getTime().hour());
+        String minute = String(_rtc->getTime().minute());
+        // left pad them with zeros if needed
+        if(hour.length() < 2) hour = "0" + hour;
+        if(minute.length() < 2) minute = "0" + minute;
+
+        // Work out how big the text is gonna be
+        sDOS_FrameBuffer::Region affectedRegionHour   = _frameBuffer->boundText(0, 0, hour, &timeFont);
+        sDOS_FrameBuffer::Region affectedRegionMinute = _frameBuffer->boundText(0, 0, minute, &timeFont);
+
+        // Offset calculation
+        uint16_t leftPadHour = (_frameBuffer->getHeight() - affectedRegionHour.getWidth()) / 2;
+        uint16_t leftPadMinutes = (_frameBuffer->getHeight() - affectedRegionMinute.getWidth()) / 2;
+        uint16_t topPadPerLineAdvance = timeFont.yAdvance - 5;
+        uint16_t topPad = (_frameBuffer->getWidth() - affectedRegionHour.getHeight()) / 2;
+        topPad = topPad - (topPadPerLineAdvance / 2);
+
+        // Manually jiggle it over s'more because it doesn't look quite right
+        leftPadHour -= 3;
+        leftPadMinutes -= 3;
+        topPad -= 18;
+
+        //_debugger.Debug(_component, "TopPadding : FB Width : %d, region height: %d, topPad : %d", _frameBuffer->getWidth(), affectedRegionHour.getHeight(), topPad);
+        //_debugger.Debug(_component, "LeftPadding: FB Height: %d, region width : %d, leftPad: %d", _frameBuffer->getHeight(), affectedRegionHour.getWidth(), leftPadHour);
+
+        affectedRegionHour = _frameBuffer->drawText(leftPadHour, topPad , hour, &timeFont, colour);
+        affectedRegionMinute = _frameBuffer->drawText(leftPadMinutes, topPad + topPadPerLineAdvance, minute, &timeFont, colour);
+        //affectedRegionHour.highlight(_frameBuffer, FB_BLUE);
+        //affectedRegionMinute.highlight(_frameBuffer, FB_PINK);
+
+        //drawDebugBoundingBox();
+        paintTray();
+    }
+
+    void paintTray(){
+        const sDOS_FrameBuffer::Colour background = FB_BLACK;
+        const sDOS_FrameBuffer::Colour colour = FB_WHITE;
+        const GFXfont * trayFont = &Picopixel;
+        uint16_t trayHeight = 10;
+        sDOS_FrameBuffer::Coordinate topLeft     = sDOS_FrameBuffer::Coordinate(0,12);
+        sDOS_FrameBuffer::Coordinate topRight    = sDOS_FrameBuffer::Coordinate(_frameBuffer->getHeight() - 1, 12);
+        _frameBuffer->drawLine(topLeft, topRight, colour);
+        if(this->_isOnCharge){
+            _frameBuffer->drawText(_frameBuffer->getHeight() - 30,0, "charging", trayFont, FB_BLUE);
+        }else{
+            _frameBuffer->drawText(_frameBuffer->getHeight() - 30,0, "discharging", trayFont, FB_RED);
+        }
+
+    }
 
     void loop() override {
         if (WatchService::_faciaButtonPressed) {
@@ -67,29 +121,30 @@ public:
         }
         if(WatchService::_rtcReadyFired){
             WatchService::_rtcReadyFired = false;
-            _debugger.Debug(_component, "RTC ready ¯\\_(ツ)_/¯");
+            //_debugger.Debug(_component, "RTC ready ¯\\_(ツ)_/¯");
             _rtc->setAlarmInMinutes(1);
+            paintTime();
         }
         if(WatchService::_rtcInterruptFired){
             WatchService::_rtcInterruptFired = false;
-            _debugger.Debug(_component, "RTC interrupt ¯\\_(ツ)_/¯");
+           // _debugger.Debug(_component, "RTC interrupt ¯\\_(ツ)_/¯");
             _rtc->setAlarmInMinutes(1);
+            paintTime();
         }
         if(WatchService::_cpuFrequencyMhzInterruptFired){
             WatchService::_cpuFrequencyMhzInterruptFired = false;
-            _debugger.Debug(_component, "CPU Frequency now %d", WatchService::_cpuFreqencyMhz);
         }
         if(WatchService::_chargeStateChanged){
             WatchService::_chargeStateChanged = false;
+            paintTray();
             if(WatchService::_isOnCharge){
+                _debugger.Debug(_component, "I have been put on charge");
                 if(!_hasActiveRadioRequests){
                     //_wifi->addRequestActive();
                     //_ota->activate();
                     //BluetoothManager::addRequest();
                     _hasActiveRadioRequests = true;
                 }
-                _debugger.Debug(_component, "I have been put on charge");
-
             }else{
                 _debugger.Debug(_component, "I have been taken off charge");
                 if(_hasActiveRadioRequests){
@@ -107,23 +162,25 @@ public:
             _bleh = false;
             _frameBuffer->getDisplay()->setBacklight(255);
             _frameBuffer->getDisplay()->setEnabled(true);
-            _frameBuffer->setAll(255, 0, 0);
+            _frameBuffer->fillEntireFrame(FB_RED);
             _led->setBrightness(0);
-            _frameBuffer->drawText(10, 10, "Fuck", &Picopixel, FB_GREEN);
+            _frameBuffer->drawText(10, 10, "One Side", &Picopixel, FB_GREEN);
         } else {
             _bleh = true;
             _frameBuffer->getDisplay()->setBacklight(255);
             _frameBuffer->getDisplay()->setEnabled(true);
-            _frameBuffer->setAll(0, 255, 0);
+            _frameBuffer->fillEntireFrame(FB_GREEN);
             _led->setBrightness(255);
-            _frameBuffer->drawText(10, 10, "Nugget", &Picopixel, FB_RED);
+            _frameBuffer->drawText(10, 10, "And the other", &Picopixel, FB_RED);
         }
 
         for(uint i = 0; i <= rand()%15 + 5; i++){
+            sDOS_FrameBuffer::Colour colour = sDOS_FrameBuffer::Colour(rand() % 155 + 100,rand() % 155 + 100,rand() % 155 + 100);
+
             _frameBuffer->drawLine(
-                    rand() % DISPLAY_HEIGHT, rand() % DISPLAY_WIDTH,
-                    rand() % DISPLAY_HEIGHT, rand() % DISPLAY_WIDTH,
-                    rand() % 155 + 100, rand() % 155 + 100, rand() % 155 + 100
+                    rand() % _frameBuffer->getHeight(), rand() % _frameBuffer->getWidth(),
+                    rand() % _frameBuffer->getHeight(), rand() % _frameBuffer->getWidth(),
+                    colour
             );
         }
     };
@@ -152,6 +209,7 @@ public:
     }
     static void rtcReady(const String& payload){
         WatchService::_rtcReadyFired = true;
+
     }
     static void rtcInterrupt(const String& payload){
         WatchService::_rtcInterruptFired = true;
@@ -165,13 +223,28 @@ public:
         WatchService::_isOnCharge = payload == "charging";
     }
 
+    void drawDebugBoundingBox(){
+        sDOS_FrameBuffer::Coordinate topLeft     = sDOS_FrameBuffer::Coordinate(0,0);
+        sDOS_FrameBuffer::Coordinate topRight    = sDOS_FrameBuffer::Coordinate(_frameBuffer->getHeight() - 1, 0);
+        sDOS_FrameBuffer::Coordinate bottomLeft  = sDOS_FrameBuffer::Coordinate(0, _frameBuffer->getWidth() - 1);
+        sDOS_FrameBuffer::Coordinate bottomRight = sDOS_FrameBuffer::Coordinate(_frameBuffer->getHeight() - 1, _frameBuffer->getWidth() - 1);
+
+        _frameBuffer->drawLine(topLeft,    topRight,    FB_DARK_GREY);
+        _frameBuffer->drawLine(bottomLeft, bottomRight, FB_DARK_GREY);
+        _frameBuffer->drawLine(topLeft,    bottomLeft,  FB_DARK_GREY);
+        _frameBuffer->drawLine(topRight,   bottomRight, FB_DARK_GREY);
+
+        _frameBuffer->drawLine(_frameBuffer->getHeight() / 2, 0,_frameBuffer->getHeight() / 2, _frameBuffer->getWidth() - 1, FB_DARK_GREY);
+        _frameBuffer->drawLine(0,_frameBuffer->getWidth() / 2,_frameBuffer->getHeight() - 1,_frameBuffer->getWidth() / 2, FB_DARK_GREY);
+    }
+
     void drawTestBoxes() {
-        _frameBuffer->setAll(FB_BLACK);
+        _frameBuffer->fillEntireFrame(FB_BLACK);
 
         sDOS_FrameBuffer::Coordinate topLeft = sDOS_FrameBuffer::Coordinate(10,10);
-        sDOS_FrameBuffer::Coordinate topRight = sDOS_FrameBuffer::Coordinate(DISPLAY_HEIGHT - 10, 10);
-        sDOS_FrameBuffer::Coordinate bottomLeft = sDOS_FrameBuffer::Coordinate(10, DISPLAY_WIDTH - 10);
-        sDOS_FrameBuffer::Coordinate bottomRight = sDOS_FrameBuffer::Coordinate(DISPLAY_HEIGHT - 10, DISPLAY_WIDTH - 10);
+        sDOS_FrameBuffer::Coordinate topRight = sDOS_FrameBuffer::Coordinate(_frameBuffer->getHeight() - 10, 10);
+        sDOS_FrameBuffer::Coordinate bottomLeft = sDOS_FrameBuffer::Coordinate(10, _frameBuffer->getWidth() - 10);
+        sDOS_FrameBuffer::Coordinate bottomRight = sDOS_FrameBuffer::Coordinate(_frameBuffer->getHeight() - 10, _frameBuffer->getWidth() - 10);
 
         sDOS_FrameBuffer::Coordinate innerTopLeft = topLeft.move(10,10);
         sDOS_FrameBuffer::Coordinate innerTopRight = topRight.move(-10,10);
@@ -179,10 +252,10 @@ public:
         sDOS_FrameBuffer::Coordinate innerBottomRight = bottomRight.move(-10,-10);
 
         // Outer white frame border
-        _frameBuffer->drawLine(0,0,0,DISPLAY_WIDTH-1, FB_WHITE);
-        _frameBuffer->drawLine(DISPLAY_HEIGHT-1 ,0,0,0, FB_WHITE);
-        _frameBuffer->drawLine(DISPLAY_HEIGHT-1, DISPLAY_WIDTH-1, 0,DISPLAY_WIDTH-1, FB_WHITE);
-        _frameBuffer->drawLine(DISPLAY_HEIGHT-1 ,0,DISPLAY_HEIGHT-1,DISPLAY_WIDTH-1, FB_WHITE);
+        _frameBuffer->drawLine(0,0,0,_frameBuffer->getWidth()-1, FB_WHITE);
+        _frameBuffer->drawLine(_frameBuffer->getHeight()-1 ,0,0,0, FB_WHITE);
+        _frameBuffer->drawLine(_frameBuffer->getHeight()-1, _frameBuffer->getWidth()-1, 0,_frameBuffer->getWidth()-1, FB_WHITE);
+        _frameBuffer->drawLine(_frameBuffer->getHeight()-1 ,0,_frameBuffer->getHeight()-1,_frameBuffer->getWidth()-1, FB_WHITE);
 
         // Inner colour square
         _frameBuffer->drawLine(topLeft, topRight, FB_RED);
@@ -198,6 +271,8 @@ public:
         _frameBuffer->drawLine(innerBottomRight, innerBottomLeft, FB_BLUE);
         _frameBuffer->drawLine(innerBottomLeft, innerTopLeft, FB_PINK);
     }
+
+
 
 private:
     String _component = "timepiece";
