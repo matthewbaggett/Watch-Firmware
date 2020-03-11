@@ -10,6 +10,12 @@
 #include <drivers/display/frame_buffer.hpp>
 #include <drivers/display/fonts/FreeMonoBold24pt7b.h>
 #include <drivers/display/fonts/Picopixel.h>
+#include "icons/BATTERY_PERCENT_0.xbm.h"
+#include "icons/BATTERY_PERCENT_25.xbm.h"
+#include "icons/BATTERY_PERCENT_50.xbm.h"
+#include "icons/BATTERY_PERCENT_75.xbm.h"
+#include "icons/BATTERY_PERCENT_100.xbm.h"
+#include "icons/BATTERY_PERCENT_CHARGING.xbm.h"
 #include <cstdlib>
 #include <string>
 
@@ -103,9 +109,9 @@ public:
         sDOS_FrameBuffer::Coordinate topRight    = sDOS_FrameBuffer::Coordinate(_frameBuffer->getHeight() - 1, 12);
         _frameBuffer->drawLine(topLeft, topRight, colour);
         if(this->_isOnCharge){
-            _frameBuffer->drawText(_frameBuffer->getHeight() - 30,0, "charging", trayFont, FB_BLUE);
+            _frameBuffer->drawXBM(_frameBuffer->getHeight() - 30, 0, BATTERY_PERCENT_CHARGING_width, BATTERY_PERCENT_CHARGING_height, BATTERY_PERCENT_CHARGING_bits);
         }else{
-            _frameBuffer->drawText(_frameBuffer->getHeight() - 30,0, "discharging", trayFont, FB_RED);
+            _frameBuffer->drawXBM(_frameBuffer->getHeight() - 30, 0, BATTERY_PERCENT_0_width, BATTERY_PERCENT_0_height, BATTERY_PERCENT_0_bits);
         }
 
     }
