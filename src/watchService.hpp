@@ -109,9 +109,9 @@ public:
         sDOS_FrameBuffer::Coordinate topRight    = sDOS_FrameBuffer::Coordinate(_frameBuffer->getHeight() - 1, 12);
         _frameBuffer->drawLine(topLeft, topRight, colour);
         if(this->_isOnCharge){
-            _frameBuffer->drawXBM(_frameBuffer->getHeight() - 30, 0, BATTERY_PERCENT_CHARGING_width, BATTERY_PERCENT_CHARGING_height, BATTERY_PERCENT_CHARGING_bits);
+           // _frameBuffer->drawXBM(_frameBuffer->getHeight() - 30, 0, BATTERY_PERCENT_CHARGING_width, BATTERY_PERCENT_CHARGING_height, BATTERY_PERCENT_CHARGING_bits);
         }else{
-            _frameBuffer->drawXBM(_frameBuffer->getHeight() - 30, 0, BATTERY_PERCENT_0_width, BATTERY_PERCENT_0_height, BATTERY_PERCENT_0_bits);
+           // _frameBuffer->drawXBM(_frameBuffer->getHeight() - 30, 0, BATTERY_PERCENT_0_width, BATTERY_PERCENT_0_height, BATTERY_PERCENT_0_bits);
         }
 
     }
