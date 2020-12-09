@@ -25,5 +25,4 @@ program-m5watch:
 monitor-m5watch:
 	pio run -e m5stackcplus -t monitor
 
-m5watch: clear update clear
-	pion run -e m5stackcplus -t upload -t monitor
+m5watch: clear update clear build-m5watch program-m5watch monitor-m5watch
