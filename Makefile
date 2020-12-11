@@ -4,25 +4,25 @@ update:
 clear:
 	clear
 clean:
-	-astyle "src/*.hpp" "src/*.cpp" "src/*.h" "src/hardware/*.h"
-	@-rm **/*.orig
-prepare: clear update clean clear
+	-astyle -r "*.hpp" "*.cpp" "*.h"
+	find . -type f -name '*.orig' -delete
+prepare: clear install-hooks update clean clear
 
 install-hooks:
 	cp -v .githooks/* .git/hooks/
 
-build-watch:
+build-t-watch:
 	@rm -Rf .pio/build/watch/lib324
 	pio run -e watch
-program-watch:
+program-t-watch:
 	pio run -e watch -t upload
-program-watch-ota:
+program-t-watch-ota:
 	pio run -e watch --upload-port 192.168.43.178 -t upload
-monitor-watch:
+monitor-t-watch:
 	pio run -e watch -t monitor
-watch: prepare build-watch program-watch monitor-watch
+t-watch: prepare build-t-watch program-t-watch monitor-t-watch
 
-watch-data:
+t-watch-data:
 	pio run -e watch -t buildfs -t uploadfs
 
 build-m5watch:
