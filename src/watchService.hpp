@@ -3,7 +3,8 @@
 #include <NTPClient.h>
 #include <debugger.hpp>
 #include <events.hpp>
-#include <abstracts/rtc.hpp>
+#include <drivers/rtc/rtc.hpp>
+#include <drivers/touch/button.hpp>
 #include <drivers/WiFiManager.hpp>
 #include <drivers/BluetoothManager.hpp>
 #include <services/cpu_scaler.hpp>
@@ -25,11 +26,13 @@
 
 class WatchService : public sDOS_Abstract_Service {
 public:
-    WatchService(Debugger &debugger, EventsManager &eventsManager, sDOS_PCF8563 *rtc, WiFiManager *wifi,
-                 BluetoothManager *bt, sDOS_OTA_Service *ota, sDOS_CPU_SCALER *cpuScaler, sDOS_FrameBuffer *frameBuffer, sDOS_TTP223 *button,
-                 sDOS_LED_MONO *led)
-        : _debugger(debugger), _eventsManager(eventsManager), _rtc(rtc), _wifi(wifi), _bt(bt), _ota(ota),
-          _cpuScaler(cpuScaler), _frameBuffer(frameBuffer), _button(button), _led(led) {
+    WatchService(
+        Debugger &debugger,
+        EventsManager &eventsManager
+    ) :
+        _debugger(debugger),
+        _eventsManager(eventsManager)
+    {
         // Setup events listeners
         EventsManager::on(F("TTP223_down"), &WatchService::faciaButtonPressCallback);
         EventsManager::on(F("wifi_on"), &WatchService::wifiStateChangeOn);
@@ -40,16 +43,22 @@ public:
         EventsManager::on(F("rtc_interrupt"), &WatchService::rtcInterrupt);
         EventsManager::on(F("cpu_freq_mhz"), &WatchService::cpuFrequencyChange);
         EventsManager::on(F("power_state"), &WatchService::powerStateChange);
-    };
+
+        this->setup();
+    }
 
     void setup() override {
         _debugger.Debug(_component, "setup begin");
         _led->setBrightness(0);
+        _debugger.Debug(_component, "led brightness set");
         _frameBuffer->getDisplay()->setBacklight(255);
+        _debugger.Debug(_component, "backlight brightness set");
         _frameBuffer->getDisplay()->setEnabled(true);
-        _debugger.Debug(_component, "A-4");
+        _debugger.Debug(_component, "display enabled");
         paintTime();
+        _debugger.Debug(_component, "paintTime");
         paintTray();
+        _debugger.Debug(_component, "paintTray");
 
         // All done
         _debugger.Debug(_component, "setup over");
@@ -219,7 +228,6 @@ public:
     }
     static void rtcReady(const String& payload) {
         WatchService::_rtcReadyFired = true;
-
     }
     static void rtcInterrupt(const String& payload) {
         WatchService::_rtcInterruptFired = true;
@@ -283,18 +291,17 @@ public:
     }
 
 
-
-private:
+protected:
     String _component = "timepiece";
     Debugger _debugger;
     EventsManager _eventsManager;
-    sDOS_PCF8563 *_rtc;
+    sDOS_RTC *_rtc;
     WiFiManager *_wifi;
     BluetoothManager *_bt;
     sDOS_OTA_Service *_ota;
     sDOS_CPU_SCALER *_cpuScaler;
     sDOS_FrameBuffer *_frameBuffer;
-    sDOS_TTP223 *_button;
+    sDOS_BUTTON *_button;
     sDOS_LED_MONO *_led;
     bool _bleh = false;
     static bool _faciaButtonPressed;
