@@ -4,10 +4,7 @@
 
 class Watch : public sDOS {
 public:
-    void Setup() {
-        // Instantiate sDOS core.
-        sDOS::Setup();
-
+    Watch() : sDOS() {
         // Create OTA service instance
         _ota = new sDOS_OTA_Service(_debugger, _events, _driver_WiFi, _cpuScaler);
 

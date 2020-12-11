@@ -4,9 +4,7 @@
 
 Watch _timepiece;
 
-void setup() {
-    _timepiece.Setup();
-}
+void setup() {}
 
 void loop() {
     _timepiece.Loop();
