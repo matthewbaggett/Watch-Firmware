@@ -1,4 +1,5 @@
 update:
+	pio run -t clean
 	git -C ./ pull
 	git -C ./.pio/libdeps/watch/Smol-Device-Operating-System pull
 clear:
