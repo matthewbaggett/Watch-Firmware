@@ -7,3 +7,4 @@
 data/wifi.json
 /cmake-build-debug/
 /cmake-build-watch/
+**/*.orig

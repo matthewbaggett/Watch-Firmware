@@ -28,8 +28,8 @@ public:
     WatchService(Debugger &debugger, EventsManager &eventsManager, sDOS_PCF8563 *rtc, WiFiManager *wifi,
                  BluetoothManager *bt, sDOS_OTA_Service *ota, sDOS_CPU_SCALER *cpuScaler, sDOS_FrameBuffer *frameBuffer, sDOS_TTP223 *button,
                  sDOS_LED_MONO *led)
-            : _debugger(debugger), _eventsManager(eventsManager), _rtc(rtc), _wifi(wifi), _bt(bt), _ota(ota),
-              _cpuScaler(cpuScaler), _frameBuffer(frameBuffer), _button(button), _led(led) {
+        : _debugger(debugger), _eventsManager(eventsManager), _rtc(rtc), _wifi(wifi), _bt(bt), _ota(ota),
+          _cpuScaler(cpuScaler), _frameBuffer(frameBuffer), _button(button), _led(led) {
         // Setup events listeners
         EventsManager::on(F("TTP223_down"), &WatchService::faciaButtonPressCallback);
         EventsManager::on(F("wifi_on"), &WatchService::wifiStateChangeOn);
@@ -58,7 +58,7 @@ public:
         //BluetoothManager::addRequest();
     };
 
-    void paintTime(){
+    void paintTime() {
         sDOS_FrameBuffer::Colour background = FB_BLACK;
         sDOS_FrameBuffer::Colour colour = FB_WHITE;
         // Set the entire screen to solid black
@@ -91,7 +91,7 @@ public:
         //_debugger.Debug(_component, "TopPadding : FB Width : %d, region height: %d, topPad : %d", _frameBuffer->getWidth(), affectedRegionHour.getHeight(), topPad);
         //_debugger.Debug(_component, "LeftPadding: FB Height: %d, region width : %d, leftPad: %d", _frameBuffer->getHeight(), affectedRegionHour.getWidth(), leftPadHour);
 
-        affectedRegionHour = _frameBuffer->drawText(leftPadHour, topPad , hour, &timeFont, colour);
+        affectedRegionHour = _frameBuffer->drawText(leftPadHour, topPad, hour, &timeFont, colour);
         affectedRegionMinute = _frameBuffer->drawText(leftPadMinutes, topPad + topPadPerLineAdvance, minute, &timeFont, colour);
         //affectedRegionHour.highlight(_frameBuffer, FB_BLUE);
         //affectedRegionMinute.highlight(_frameBuffer, FB_PINK);
@@ -100,7 +100,7 @@ public:
         paintTray();
     }
 
-    void paintTray(){
+    void paintTray() {
         const sDOS_FrameBuffer::Colour background = FB_BLACK;
         const sDOS_FrameBuffer::Colour colour = FB_WHITE;
         const GFXfont * trayFont = &Picopixel;
@@ -108,10 +108,10 @@ public:
         sDOS_FrameBuffer::Coordinate topLeft     = sDOS_FrameBuffer::Coordinate(0,12);
         sDOS_FrameBuffer::Coordinate topRight    = sDOS_FrameBuffer::Coordinate(_frameBuffer->getHeight() - 1, 12);
         _frameBuffer->drawLine(topLeft, topRight, colour);
-        if(this->_isOnCharge){
-           // _frameBuffer->drawXBM(_frameBuffer->getHeight() - 30, 0, BATTERY_PERCENT_CHARGING_width, BATTERY_PERCENT_CHARGING_height, BATTERY_PERCENT_CHARGING_bits);
-        }else{
-           // _frameBuffer->drawXBM(_frameBuffer->getHeight() - 30, 0, BATTERY_PERCENT_0_width, BATTERY_PERCENT_0_height, BATTERY_PERCENT_0_bits);
+        if(this->_isOnCharge) {
+            // _frameBuffer->drawXBM(_frameBuffer->getHeight() - 30, 0, BATTERY_PERCENT_CHARGING_width, BATTERY_PERCENT_CHARGING_height, BATTERY_PERCENT_CHARGING_bits);
+        } else {
+            // _frameBuffer->drawXBM(_frameBuffer->getHeight() - 30, 0, BATTERY_PERCENT_0_width, BATTERY_PERCENT_0_height, BATTERY_PERCENT_0_bits);
         }
 
     }
@@ -121,39 +121,39 @@ public:
             WatchService::_faciaButtonPressed = false;
             touch();
         }
-        if(WatchService::_wifiStateHasChanged){
+        if(WatchService::_wifiStateHasChanged) {
             WatchService::_wifiStateHasChanged = false;
             _debugger.Debug(_component, "Wifi State has changed ¯\\_(ツ)_/¯");
         }
-        if(WatchService::_rtcReadyFired){
+        if(WatchService::_rtcReadyFired) {
             WatchService::_rtcReadyFired = false;
             //_debugger.Debug(_component, "RTC ready ¯\\_(ツ)_/¯");
             _rtc->setAlarmInMinutes(1);
             paintTime();
         }
-        if(WatchService::_rtcInterruptFired){
+        if(WatchService::_rtcInterruptFired) {
             WatchService::_rtcInterruptFired = false;
-           // _debugger.Debug(_component, "RTC interrupt ¯\\_(ツ)_/¯");
+            // _debugger.Debug(_component, "RTC interrupt ¯\\_(ツ)_/¯");
             _rtc->setAlarmInMinutes(1);
             paintTime();
         }
-        if(WatchService::_cpuFrequencyMhzInterruptFired){
+        if(WatchService::_cpuFrequencyMhzInterruptFired) {
             WatchService::_cpuFrequencyMhzInterruptFired = false;
         }
-        if(WatchService::_chargeStateChanged){
+        if(WatchService::_chargeStateChanged) {
             WatchService::_chargeStateChanged = false;
             paintTray();
-            if(WatchService::_isOnCharge){
+            if(WatchService::_isOnCharge) {
                 _debugger.Debug(_component, "I have been put on charge");
-                if(!_hasActiveRadioRequests){
+                if(!_hasActiveRadioRequests) {
                     //_wifi->addRequestActive();
                     //_ota->activate();
                     //BluetoothManager::addRequest();
                     _hasActiveRadioRequests = true;
                 }
-            }else{
+            } else {
                 _debugger.Debug(_component, "I have been taken off charge");
-                if(_hasActiveRadioRequests){
+                if(_hasActiveRadioRequests) {
                     //_ota->deactivate();
                     //_wifi->removeRequestActive();
                     //BluetoothManager::removeRequest();
@@ -180,56 +180,60 @@ public:
             _frameBuffer->drawText(10, 10, "And the other", &Picopixel, FB_RED);
         }
 
-        for(uint i = 0; i <= rand()%15 + 5; i++){
+        for(uint i = 0; i <= rand()%15 + 5; i++) {
             sDOS_FrameBuffer::Colour colour = sDOS_FrameBuffer::Colour(rand() % 155 + 100,rand() % 155 + 100,rand() % 155 + 100);
 
             _frameBuffer->drawLine(
-                    rand() % _frameBuffer->getHeight(), rand() % _frameBuffer->getWidth(),
-                    rand() % _frameBuffer->getHeight(), rand() % _frameBuffer->getWidth(),
-                    colour
+                rand() % _frameBuffer->getHeight(), rand() % _frameBuffer->getWidth(),
+                rand() % _frameBuffer->getHeight(), rand() % _frameBuffer->getWidth(),
+                colour
             );
         }
     };
 
-    String getName() override { return _component; };
+    String getName() override {
+        return _component;
+    };
 
-    bool isActive() override { return true; };
+    bool isActive() override {
+        return true;
+    };
 
     static void faciaButtonPressCallback(const String& payload) {
         WatchService::_faciaButtonPressed = true;
     };
 
-    static void wifiStateChangeOn(const String& payload){
+    static void wifiStateChangeOn(const String& payload) {
         WatchService::_wifiStateHasChanged = true;
     }
-    static void wifiStateChangeOff(const String& payload){
+    static void wifiStateChangeOff(const String& payload) {
         WatchService::_wifiStateHasChanged = true;
     }
-    static void wifiStateGotIP(const String& payload){
+    static void wifiStateGotIP(const String& payload) {
         WatchService::_wifiIp = payload;
         WatchService::_wifiStateHasChanged = true;
     }
-    static void wifiStateDisconnected(const String& payload){
+    static void wifiStateDisconnected(const String& payload) {
         WatchService::_wifiIp.clear();
         WatchService::_wifiStateHasChanged = true;
     }
-    static void rtcReady(const String& payload){
+    static void rtcReady(const String& payload) {
         WatchService::_rtcReadyFired = true;
 
     }
-    static void rtcInterrupt(const String& payload){
+    static void rtcInterrupt(const String& payload) {
         WatchService::_rtcInterruptFired = true;
     }
-    static void cpuFrequencyChange(const String & payload){
+    static void cpuFrequencyChange(const String & payload) {
         WatchService::_cpuFreqencyMhz = strtol(payload.c_str(), nullptr, 10);
         WatchService::_cpuFrequencyMhzInterruptFired = true;
     }
-    static void powerStateChange(const String & payload){
+    static void powerStateChange(const String & payload) {
         WatchService::_chargeStateChanged = true;
         WatchService::_isOnCharge = payload == "charging";
     }
 
-    void drawDebugBoundingBox(){
+    void drawDebugBoundingBox() {
         sDOS_FrameBuffer::Coordinate topLeft     = sDOS_FrameBuffer::Coordinate(0,0);
         sDOS_FrameBuffer::Coordinate topRight    = sDOS_FrameBuffer::Coordinate(_frameBuffer->getHeight() - 1, 0);
         sDOS_FrameBuffer::Coordinate bottomLeft  = sDOS_FrameBuffer::Coordinate(0, _frameBuffer->getWidth() - 1);
@@ -259,9 +263,9 @@ public:
 
         // Outer white frame border
         _frameBuffer->drawLine(0,0,0,_frameBuffer->getWidth()-1, FB_WHITE);
-        _frameBuffer->drawLine(_frameBuffer->getHeight()-1 ,0,0,0, FB_WHITE);
+        _frameBuffer->drawLine(_frameBuffer->getHeight()-1,0,0,0, FB_WHITE);
         _frameBuffer->drawLine(_frameBuffer->getHeight()-1, _frameBuffer->getWidth()-1, 0,_frameBuffer->getWidth()-1, FB_WHITE);
-        _frameBuffer->drawLine(_frameBuffer->getHeight()-1 ,0,_frameBuffer->getHeight()-1,_frameBuffer->getWidth()-1, FB_WHITE);
+        _frameBuffer->drawLine(_frameBuffer->getHeight()-1,0,_frameBuffer->getHeight()-1,_frameBuffer->getWidth()-1, FB_WHITE);
 
         // Inner colour square
         _frameBuffer->drawLine(topLeft, topRight, FB_RED);
