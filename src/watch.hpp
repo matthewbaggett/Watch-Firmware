@@ -11,10 +11,10 @@ class Watch : public sDOS {
 public:
     Watch() : sDOS() {
         // Create OTA service instance
-        _ota = new sDOS_OTA_Service(_debugger, _events, _driver_WiFi, _cpuScaler);
+        //_ota = new sDOS_OTA_Service(_debugger, _events, _driver_WiFi, _cpuScaler);
 
         // Create our watch service
-#ifdef HARDWARE_M5STACK_C
+#ifdef HARDWARE_M5STACK_C__
         _watchService = new M5StackC_WatchService(
             _debugger,
             _events,
@@ -26,7 +26,7 @@ public:
             _driver_FrameBuffer
         );
 #endif
-#ifdef HARDWARE_TWATCH
+#ifdef HARDWARE_TWATCH__
         _watchService = new TWatch_WatchService(
             _debugger,
             _events,
@@ -45,8 +45,9 @@ public:
         //_watchService->setup();
 
         // Add our watchService et al to sDOS core. We can add drivers like this too.
-        sDOS::add(_ota);
-        sDOS::add(_watchService);
+        //sDOS::add(_ota);
+        //sDOS::add(_watchService);
+        Serial.println("End of Watch::Watch()");
     };
 
 protected:

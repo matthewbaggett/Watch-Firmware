@@ -28,6 +28,7 @@ public:
         sDOS_LED_MONO *led
     ) : WatchService(debugger, eventsManager) {
 
+        debugger.Debug("test", "arse");
         _rtc = rtc;
         _wifi = wifi;
         _bt = bt;

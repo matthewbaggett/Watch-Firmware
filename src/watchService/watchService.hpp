@@ -14,12 +14,12 @@
 #include <drivers/display/frame_buffer.hpp>
 #include <drivers/display/fonts/FreeMonoBold24pt7b.h>
 #include <drivers/display/fonts/Picopixel.h>
-#include <icons/BATTERY_PERCENT_0.xbm.h>
-#include <icons/BATTERY_PERCENT_25.xbm.h>
-#include <icons/BATTERY_PERCENT_50.xbm.h>
-#include <icons/BATTERY_PERCENT_75.xbm.h>
-#include <icons/BATTERY_PERCENT_100.xbm.h>
-#include <icons/BATTERY_PERCENT_CHARGING.xbm.h>
+//#include <icons/BATTERY_PERCENT_0.xbm.h>
+//#include <icons/BATTERY_PERCENT_25.xbm.h>
+//#include <icons/BATTERY_PERCENT_50.xbm.h>
+//#include <icons/BATTERY_PERCENT_75.xbm.h>
+//#include <icons/BATTERY_PERCENT_100.xbm.h>
+//#include <icons/BATTERY_PERCENT_CHARGING.xbm.h>
 #include <cstdlib>
 #include <string>
 

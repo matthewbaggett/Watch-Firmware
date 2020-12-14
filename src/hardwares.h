@@ -2,5 +2,5 @@
 #include "hardware/t-watch.h"
 
 #ifndef HARDWARE_DEFINED
-#error Only Debug builds are supported
+#error Hardware has not been defined!
 #endif
