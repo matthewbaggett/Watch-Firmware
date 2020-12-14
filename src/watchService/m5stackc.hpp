@@ -17,22 +17,21 @@
 class M5StackC_WatchService : public WatchService {
 public:
     M5StackC_WatchService(
-        Debugger &debugger,
-        EventsManager &eventsManager,
+        Debugger * debugger,
+        EventsManager * eventsManager,
+        sDOS_FrameBuffer *frameBuffer,
         sDOS_FAKE_RTC *rtc,
         WiFiManager *wifi,
         BluetoothManager *bt,
         sDOS_OTA_Service *ota,
         sDOS_CPU_SCALER *cpuScaler,
-        sDOS_FrameBuffer *frameBuffer
-    ) : WatchService(debugger, eventsManager) {
+    ) : WatchService(debugger, eventsManager, frameBuffer) {
 
         _rtc = rtc;
         _wifi = wifi;
         _bt = bt;
         _ota = ota;
         _cpuScaler = cpuScaler;
-        _frameBuffer = frameBuffer;
 
     };
 

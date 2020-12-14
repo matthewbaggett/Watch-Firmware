@@ -16,19 +16,19 @@
 class TWatch_WatchService : public WatchService {
 public:
     TWatch_WatchService(
-        Debugger &debugger,
-        EventsManager &eventsManager,
+        Debugger * debugger,
+        EventsManager * eventsManager,
+        sDOS_FrameBuffer * frameBuffer,
         sDOS_PCF8563 *rtc,
         WiFiManager *wifi,
         BluetoothManager *bt,
         sDOS_OTA_Service *ota,
         sDOS_CPU_SCALER *cpuScaler,
-        sDOS_FrameBuffer *frameBuffer,
         sDOS_TTP223 *button,
         sDOS_LED_MONO *led
-    ) : WatchService(debugger, eventsManager) {
+    ) : WatchService(debugger, eventsManager, frameBuffer) {
 
-        debugger.Debug("test", "arse");
+        debugger->Debug("test", "arse");
         _rtc = rtc;
         _wifi = wifi;
         _bt = bt;
@@ -36,7 +36,6 @@ public:
         _cpuScaler = cpuScaler;
         _button = button;
         _led = led;
-        _frameBuffer = frameBuffer;
 
     };
 

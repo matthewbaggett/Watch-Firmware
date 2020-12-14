@@ -30,12 +30,10 @@
 class WatchService : public sDOS_Abstract_Service {
 public:
     WatchService(
-        Debugger &debugger,
-        EventsManager &eventsManager
-    ) :
-        _debugger(debugger),
-        _eventsManager(eventsManager)
-    {
+        Debugger * debugger,
+        EventsManager * eventsManager,
+        sDOS_FrameBuffer * frameBuffer
+    ) : sDOS_Abstract_Service(debugger, eventsManager), _frameBuffer(frameBuffer)  {
         // Setup events listeners
         EventsManager::on(F("TTP223_down"), &WatchService::faciaButtonPressCallback);
         EventsManager::on(F("wifi_on"), &WatchService::wifiStateChangeOn);
@@ -47,28 +45,21 @@ public:
         EventsManager::on(F("cpu_freq_mhz"), &WatchService::cpuFrequencyChange);
         EventsManager::on(F("power_state"), &WatchService::powerStateChange);
 
-        this->setup();
-    }
-
-    void setup() override {
-        _debugger.Debug(_component, "setup begin");
-        _led->setBrightness(0);
-        _debugger.Debug(_component, "led brightness set");
-        _frameBuffer->getDisplay()->setBacklight(255);
-        _debugger.Debug(_component, "backlight brightness set");
-        _frameBuffer->getDisplay()->setEnabled(true);
-        _debugger.Debug(_component, "display enabled");
+        debugger->Debug(_component, "setup begin");
         paintTime();
-        _debugger.Debug(_component, "paintTime");
+        debugger->Debug(_component, "paintTime");
         paintTray();
-        _debugger.Debug(_component, "paintTray");
+        debugger->Debug(_component, "paintTray");
 
         // All done
-        _debugger.Debug(_component, "setup over");
+        debugger->Debug(_component, "setup over");
 
         // Allow Debugging with bluetooth UART
         //BluetoothManager::addRequest();
     };
+protected:
+    sDOS_FrameBuffer *_frameBuffer;
+public:
 
     void paintTime() {
         sDOS_FrameBuffer::Colour background = FB_BLACK;
@@ -100,8 +91,8 @@ public:
         leftPadMinutes -= 3;
         topPad -= 18;
 
-        //_debugger.Debug(_component, "TopPadding : FB Width : %d, region height: %d, topPad : %d", _frameBuffer->getWidth(), affectedRegionHour.getHeight(), topPad);
-        //_debugger.Debug(_component, "LeftPadding: FB Height: %d, region width : %d, leftPad: %d", _frameBuffer->getHeight(), affectedRegionHour.getWidth(), leftPadHour);
+        //_debugger->Debug(_component, "TopPadding : FB Width : %d, region height: %d, topPad : %d", _frameBuffer->getWidth(), affectedRegionHour.getHeight(), topPad);
+        //_debugger->Debug(_component, "LeftPadding: FB Height: %d, region width : %d, leftPad: %d", _frameBuffer->getHeight(), affectedRegionHour.getWidth(), leftPadHour);
 
         affectedRegionHour = _frameBuffer->drawText(leftPadHour, topPad, hour, &timeFont, colour);
         affectedRegionMinute = _frameBuffer->drawText(leftPadMinutes, topPad + topPadPerLineAdvance, minute, &timeFont, colour);
@@ -135,17 +126,17 @@ public:
         }
         if(WatchService::_wifiStateHasChanged) {
             WatchService::_wifiStateHasChanged = false;
-            _debugger.Debug(_component, "Wifi State has changed ¯\\_(ツ)_/¯");
+            _debugger->Debug(_component, "Wifi State has changed ¯\\_(ツ)_/¯");
         }
         if(WatchService::_rtcReadyFired) {
             WatchService::_rtcReadyFired = false;
-            //_debugger.Debug(_component, "RTC ready ¯\\_(ツ)_/¯");
+            //_debugger->Debug(_component, "RTC ready ¯\\_(ツ)_/¯");
             _rtc->setAlarmInMinutes(1);
             paintTime();
         }
         if(WatchService::_rtcInterruptFired) {
             WatchService::_rtcInterruptFired = false;
-            // _debugger.Debug(_component, "RTC interrupt ¯\\_(ツ)_/¯");
+            // _debugger->Debug(_component, "RTC interrupt ¯\\_(ツ)_/¯");
             _rtc->setAlarmInMinutes(1);
             paintTime();
         }
@@ -156,7 +147,7 @@ public:
             WatchService::_chargeStateChanged = false;
             paintTray();
             if(WatchService::_isOnCharge) {
-                _debugger.Debug(_component, "I have been put on charge");
+                _debugger->Debug(_component, "I have been put on charge");
                 if(!_hasActiveRadioRequests) {
                     //_wifi->addRequestActive();
                     //_ota->activate();
@@ -164,7 +155,7 @@ public:
                     _hasActiveRadioRequests = true;
                 }
             } else {
-                _debugger.Debug(_component, "I have been taken off charge");
+                _debugger->Debug(_component, "I have been taken off charge");
                 if(_hasActiveRadioRequests) {
                     //_ota->deactivate();
                     //_wifi->removeRequestActive();
@@ -296,14 +287,11 @@ public:
 
 protected:
     String _component = "timepiece";
-    Debugger _debugger;
-    EventsManager _eventsManager;
     sDOS_RTC *_rtc;
     WiFiManager *_wifi;
     BluetoothManager *_bt;
     sDOS_OTA_Service *_ota;
     sDOS_CPU_SCALER *_cpuScaler;
-    sDOS_FrameBuffer *_frameBuffer;
     sDOS_BUTTON *_button;
     sDOS_LED_MONO *_led;
     bool _bleh = false;

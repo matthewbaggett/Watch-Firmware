@@ -11,31 +11,31 @@ class Watch : public sDOS {
 public:
     Watch() : sDOS() {
         // Create OTA service instance
-        //_ota = new sDOS_OTA_Service(_debugger, _events, _driver_WiFi, _cpuScaler);
+        //_ota = new sDOS_OTA_Service(_debugger, _eventsManager, _driver_WiFi, _cpuScaler);
 
         // Create our watch service
 #ifdef HARDWARE_M5STACK_C__
         _watchService = new M5StackC_WatchService(
             _debugger,
-            _events,
+            _eventsManager,
+            _driver_FrameBuffer
             _driver_RTC,
             _driver_WiFi,
             _driver_BT,
             _ota,
             _cpuScaler,
-            _driver_FrameBuffer
         );
 #endif
 #ifdef HARDWARE_TWATCH__
         _watchService = new TWatch_WatchService(
             _debugger,
-            _events,
+            _eventsManager,
+            _driver_FrameBuffer
             _driver_RTC,
             _driver_WiFi,
             _driver_BT,
             _ota,
             _cpuScaler,
-            _driver_FrameBuffer,
             _button_ttp223,
             _mono_led
         );
