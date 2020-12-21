@@ -8,10 +8,9 @@ void setup() {
     Serial.begin(SERIAL_BAUD);
     Serial.setDebugOutput(true);
     delay(300);
-    Serial.println("Alive?");
 }
 
 void loop() {
-    Serial.println("Loop!");
-    //_timepiece.Loop();
+    //Serial.println("Loop!");
+    _timepiece.Loop();
 }

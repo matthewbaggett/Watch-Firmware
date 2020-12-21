@@ -2,6 +2,8 @@
 #define HARDWARE_DEFINED
 #include "driver/gpio.h"
 
+#pragma message "T-watch!"
+
 #define ENABLE_POWER
 #define POWER_MONITOR_CHARGE_STATE GPIO_NUM_32
 #define POWER_MONITOR_VBATT GPIO_NUM_35

@@ -10,6 +10,8 @@
 class Watch : public sDOS {
 public:
     Watch() : sDOS() {
+    }
+    void PostBoot() {
         // Create OTA service instance
         //_ota = new sDOS_OTA_Service(_debugger, _eventsManager, _driver_WiFi, _cpuScaler);
 
