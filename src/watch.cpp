@@ -1,3 +1,5 @@
+#define XSTR(x) STR(x)
+#define STR(x) #x
 #include "watch.hpp"
 
 //#define ENABLE_SERVICE_NTP
@@ -8,10 +10,10 @@ void setup() {
     Serial.begin(SERIAL_BAUD);
     Serial.setDebugOutput(true);
     delay(1000);
+    Serial.flush();
     _timepiece.setup();
 }
 
 void loop() {
-    //Serial.println("Loop!");
     _timepiece.Loop();
 }

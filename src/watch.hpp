@@ -13,7 +13,6 @@ public:
     }
     void setup() {
         sDOS::setup();
-        
         // Create OTA service instance
         //_ota = new sDOS_OTA_Service(_debugger, _eventsManager, _driver_WiFi, _cpuScaler);
 
@@ -46,12 +45,11 @@ public:
 #endif
 
         // Since we're too late for the setup now, we gotta run it ourselves
-        //_watchService->setup();
+        _watchService->setup();
 
         // Add our watchService et al to sDOS core. We can add drivers like this too.
         //sDOS::add(_ota);
-        //sDOS::add(_watchService);
-        Serial.println("End of Watch::Watch()");
+        sDOS::add(_watchService);
     };
 
 protected:

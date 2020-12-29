@@ -34,6 +34,7 @@ public:
         EventsManager * eventsManager,
         sDOS_FrameBuffer * frameBuffer
     ) : sDOS_Abstract_Service(debugger, eventsManager), _frameBuffer(frameBuffer)  {
+        Serial.println("Entered WatchService");
         // Setup events listeners
         EventsManager::on(F("TTP223_down"), &WatchService::faciaButtonPressCallback);
         EventsManager::on(F("wifi_on"), &WatchService::wifiStateChangeOn);

@@ -1,6 +1,7 @@
 #ifdef HARDWARE_M5STACK_C
 #define HARDWARE_DEFINED
 #include "driver/gpio.h"
+#pragma message "Chose M5stack"
 
 //#define ENABLE_POWER
 //#define POWER_MONITOR_CHARGE_STATE GPIO_NUM_32
@@ -46,7 +47,7 @@
 #define CPU_FREQ_MHZ 80
 #define CPU_FREQ_MHZ_NORADIO 10
 
-//#define ENABLE_SERVICE_NTP
+#define ENABLE_SERVICE_NTP
 //#define ENABLE_SERVICE_OTA
 
 #define ENABLE_SERVICE_SLEEPTUNE

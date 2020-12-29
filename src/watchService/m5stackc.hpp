@@ -31,13 +31,13 @@ public:
         _wifi(wifi),
         _bt(bt),
         _cpuScaler(cpuScaler)
-    {};
+    {
+        Serial.println("Entering M5StackC_WatchService");
+    };
 
 protected:
     sDOS_RTC * _rtc;
     WiFiManager * _wifi;
     BluetoothManager * _bt;
     sDOS_CPU_SCALER * _cpuScaler;
-
-
 };
