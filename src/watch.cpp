@@ -7,7 +7,8 @@ Watch _timepiece;
 void setup() {
     Serial.begin(SERIAL_BAUD);
     Serial.setDebugOutput(true);
-    delay(300);
+    delay(1000);
+    _timepiece.setup();
 }
 
 void loop() {
