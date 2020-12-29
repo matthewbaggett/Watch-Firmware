@@ -24,16 +24,20 @@ public:
         WiFiManager *wifi,
         BluetoothManager *bt,
         sDOS_OTA_Service *ota,
-        sDOS_CPU_SCALER *cpuScaler,
-    ) : WatchService(debugger, eventsManager, frameBuffer) {
+        sDOS_CPU_SCALER *cpuScaler
+    ) :
+        WatchService(debugger, eventsManager, frameBuffer),
+        _rtc(rtc),
+        _wifi(wifi),
+        _bt(bt),
+        _cpuScaler(cpuScaler)
+    {};
 
-        _rtc = rtc;
-        _wifi = wifi;
-        _bt = bt;
-        _ota = ota;
-        _cpuScaler = cpuScaler;
-
-    };
+protected:
+    sDOS_RTC * _rtc;
+    WiFiManager * _wifi;
+    BluetoothManager * _bt;
+    sDOS_CPU_SCALER * _cpuScaler;
 
 
 };
