@@ -45,11 +45,15 @@ public:
 #endif
 
         // Since we're too late for the setup now, we gotta run it ourselves
-        _watchService->setup();
+        Serial.println("A");
+        //_watchService.setup();
+
 
         // Add our watchService et al to sDOS core. We can add drivers like this too.
         //sDOS::add(_ota);
-        sDOS::add(_watchService);
+        Serial.println("B");
+        //sDOS::add(_watchService);
+        Serial.println("C");
     };
 
 protected:

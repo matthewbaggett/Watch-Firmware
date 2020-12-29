@@ -58,9 +58,6 @@ public:
         // Allow Debugging with bluetooth UART
         //BluetoothManager::addRequest();
     };
-protected:
-    sDOS_FrameBuffer *_frameBuffer;
-public:
 
     void paintTime() {
         sDOS_FrameBuffer::Colour background = FB_BLACK;
@@ -165,6 +162,10 @@ public:
                 }
             }
         }
+    };
+
+    void setup() {
+        Serial.println("WatchService::setup()");
     };
 
     void touch() {
@@ -287,6 +288,7 @@ public:
 
 
 protected:
+    sDOS_FrameBuffer *_frameBuffer;
     String _component = "timepiece";
     sDOS_RTC *_rtc;
     WiFiManager *_wifi;
