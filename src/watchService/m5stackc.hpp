@@ -23,21 +23,13 @@ public:
         sDOS_FAKE_RTC *rtc,
         WiFiManager *wifi,
         BluetoothManager *bt,
-        sDOS_OTA_Service *ota,
-        sDOS_CPU_SCALER *cpuScaler
+        sDOS_CPU_SCALER *cpuScaler,
+        sDOS_OTA_Service *ota
     ) :
-        WatchService(debugger, eventsManager, frameBuffer),
-        _rtc(rtc),
-        _wifi(wifi),
-        _bt(bt),
-        _cpuScaler(cpuScaler)
+        WatchService(debugger, eventsManager, frameBuffer, rtc, wifi, bt, cpuScaler, ota)
     {
         Serial.println("Entering M5StackC_WatchService");
+        Serial.flush();
     };
 
-protected:
-    sDOS_RTC * _rtc;
-    WiFiManager * _wifi;
-    BluetoothManager * _bt;
-    sDOS_CPU_SCALER * _cpuScaler;
 };

@@ -32,8 +32,20 @@ public:
     WatchService(
         Debugger * debugger,
         EventsManager * eventsManager,
-        sDOS_FrameBuffer * frameBuffer
-    ) : sDOS_Abstract_Service(debugger, eventsManager), _frameBuffer(frameBuffer)  {
+        sDOS_FrameBuffer * frameBuffer,
+        sDOS_FAKE_RTC *rtc,
+        WiFiManager *wifi,
+        BluetoothManager *bt,
+        sDOS_CPU_SCALER *cpuScaler,
+        sDOS_OTA_Service *ota
+    ) : sDOS_Abstract_Service(debugger, eventsManager),
+        _frameBuffer(frameBuffer),
+        _rtc(rtc),
+        _wifi(wifi),
+        _bt(bt),
+        _cpuScaler(cpuScaler),
+        _ota(ota)
+    {
         Serial.println("Entered WatchService");
         // Setup events listeners
         EventsManager::on(F("TTP223_down"), &WatchService::faciaButtonPressCallback);
@@ -60,22 +72,35 @@ public:
     };
 
     void paintTime() {
+        this->_debugger->Debug(_component, "paintTime() entry");
         sDOS_FrameBuffer::Colour background = FB_BLACK;
         sDOS_FrameBuffer::Colour colour = FB_WHITE;
         // Set the entire screen to solid black
         _frameBuffer->fillEntireFrame(background);
         GFXfont timeFont = FreeMonoBold24pt7b;
 
+        this->_debugger->Debug(_component, "paintTime() B");
+
         // Hour and minute as string
-        String hour = String(_rtc->getTime().hour());
-        String minute = String(_rtc->getTime().minute());
+        String hour = String(this->_rtc->getTime().hour());
+        this->_debugger->Debug(_component, "paintTime() B2");
+
+        String minute = String(this->_rtc->getTime().minute());
+        this->_debugger->Debug(_component, "paintTime() B3");
+
         // left pad them with zeros if needed
+        this->_debugger->Debug(_component, "paintTime() B4");
         if(hour.length() < 2) hour = "0" + hour;
+        this->_debugger->Debug(_component, "paintTime() B5");
         if(minute.length() < 2) minute = "0" + minute;
+
+        this->_debugger->Debug(_component, "paintTime() C");
 
         // Work out how big the text is gonna be
         sDOS_FrameBuffer::Region affectedRegionHour   = _frameBuffer->boundText(0, 0, hour, &timeFont);
         sDOS_FrameBuffer::Region affectedRegionMinute = _frameBuffer->boundText(0, 0, minute, &timeFont);
+
+        this->_debugger->Debug(_component, "paintTime() D");
 
         // Offset calculation
         uint16_t leftPadHour = (_frameBuffer->getHeight() - affectedRegionHour.getWidth()) / 2;
@@ -84,24 +109,32 @@ public:
         uint16_t topPad = (_frameBuffer->getWidth() - affectedRegionHour.getHeight()) / 2;
         topPad = topPad - (topPadPerLineAdvance / 2);
 
+        this->_debugger->Debug(_component, "paintTime() E");
+
         // Manually jiggle it over s'more because it doesn't look quite right
         leftPadHour -= 3;
         leftPadMinutes -= 3;
         topPad -= 18;
 
-        //_debugger->Debug(_component, "TopPadding : FB Width : %d, region height: %d, topPad : %d", _frameBuffer->getWidth(), affectedRegionHour.getHeight(), topPad);
-        //_debugger->Debug(_component, "LeftPadding: FB Height: %d, region width : %d, leftPad: %d", _frameBuffer->getHeight(), affectedRegionHour.getWidth(), leftPadHour);
+        //this->_debugger->Debug(_component, "TopPadding : FB Width : %d, region height: %d, topPad : %d", _frameBuffer->getWidth(), affectedRegionHour.getHeight(), topPad);
+        //this->_debugger->Debug(_component, "LeftPadding: FB Height: %d, region width : %d, leftPad: %d", _frameBuffer->getHeight(), affectedRegionHour.getWidth(), leftPadHour);
+
+        this->_debugger->Debug(_component, "paintTime() F");
 
         affectedRegionHour = _frameBuffer->drawText(leftPadHour, topPad, hour, &timeFont, colour);
         affectedRegionMinute = _frameBuffer->drawText(leftPadMinutes, topPad + topPadPerLineAdvance, minute, &timeFont, colour);
         //affectedRegionHour.highlight(_frameBuffer, FB_BLUE);
         //affectedRegionMinute.highlight(_frameBuffer, FB_PINK);
 
+        this->_debugger->Debug(_component, "paintTime() G");
+
         //drawDebugBoundingBox();
+        this->_debugger->Debug(_component, "paintTime() exit");
         paintTray();
     }
 
     void paintTray() {
+        this->_debugger->Debug(_component, "paintTray() entry");
         const sDOS_FrameBuffer::Colour background = FB_BLACK;
         const sDOS_FrameBuffer::Colour colour = FB_WHITE;
         const GFXfont * trayFont = &Picopixel;
@@ -114,6 +147,7 @@ public:
         } else {
             // _frameBuffer->drawXBM(_frameBuffer->getHeight() - 30, 0, BATTERY_PERCENT_0_width, BATTERY_PERCENT_0_height, BATTERY_PERCENT_0_bits);
         }
+        this->_debugger->Debug(_component, "paintTime() exit");
 
     }
 
@@ -124,18 +158,18 @@ public:
         }
         if(WatchService::_wifiStateHasChanged) {
             WatchService::_wifiStateHasChanged = false;
-            _debugger->Debug(_component, "Wifi State has changed ¯\\_(ツ)_/¯");
+            this->_debugger->Debug(_component, "Wifi State has changed ¯\\_(ツ)_/¯");
         }
         if(WatchService::_rtcReadyFired) {
             WatchService::_rtcReadyFired = false;
-            //_debugger->Debug(_component, "RTC ready ¯\\_(ツ)_/¯");
-            _rtc->setAlarmInMinutes(1);
+            //this->_debugger->Debug(_component, "RTC ready ¯\\_(ツ)_/¯");
+            this->_rtc->setAlarmInMinutes(1);
             paintTime();
         }
         if(WatchService::_rtcInterruptFired) {
             WatchService::_rtcInterruptFired = false;
-            // _debugger->Debug(_component, "RTC interrupt ¯\\_(ツ)_/¯");
-            _rtc->setAlarmInMinutes(1);
+            // this->_debugger->Debug(_component, "RTC interrupt ¯\\_(ツ)_/¯");
+            this->_rtc->setAlarmInMinutes(1);
             paintTime();
         }
         if(WatchService::_cpuFrequencyMhzInterruptFired) {
@@ -145,7 +179,7 @@ public:
             WatchService::_chargeStateChanged = false;
             paintTray();
             if(WatchService::_isOnCharge) {
-                _debugger->Debug(_component, "I have been put on charge");
+                this->_debugger->Debug(_component, "I have been put on charge");
                 if(!_hasActiveRadioRequests) {
                     //_wifi->addRequestActive();
                     //_ota->activate();
@@ -153,7 +187,7 @@ public:
                     _hasActiveRadioRequests = true;
                 }
             } else {
-                _debugger->Debug(_component, "I have been taken off charge");
+                this->_debugger->Debug(_component, "I have been taken off charge");
                 if(_hasActiveRadioRequests) {
                     //_ota->deactivate();
                     //_wifi->removeRequestActive();

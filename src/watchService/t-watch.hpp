@@ -22,18 +22,13 @@ public:
         sDOS_PCF8563 *rtc,
         WiFiManager *wifi,
         BluetoothManager *bt,
-        sDOS_OTA_Service *ota,
         sDOS_CPU_SCALER *cpuScaler,
+        sDOS_OTA_Service *ota,
         sDOS_TTP223 *button,
         sDOS_LED_MONO *led
-    ) : WatchService(debugger, eventsManager, frameBuffer) {
+    ) : WatchService(debugger, eventsManager, frameBuffer, rtc, wifi, bt, cpuScaler, ota) {
 
         debugger->Debug("test", "arse");
-        _rtc = rtc;
-        _wifi = wifi;
-        _bt = bt;
-        _ota = ota;
-        _cpuScaler = cpuScaler;
         _button = button;
         _led = led;
 

@@ -28,12 +28,7 @@ t-watch: clean-t-watch prepare build-t-watch program-t-watch-data program-t-watc
 
 
 # M5StackC related.
-clean-m5watch:
-	pio run -e m5stackcplus -t clean
-build-m5watch:
-	pio run -e m5stackcplus
-program-m5watch-data:
+m5watch:
+	#pio run -e m5stackcplus -t clean
 	pio run -e m5stackcplus -t buildfs -t uploadfs
-program-m5watch:
 	pio run -e m5stackcplus -t upload -t monitor
-m5watch: clean-m5watch prepare build-m5watch program-m5watch-data program-m5watch
