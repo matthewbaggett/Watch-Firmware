@@ -5,10 +5,10 @@ update:
 	-git -C ./.pio/libdeps/m5stack/Smol-Device-Operating-System pull
 clear:
 	clear
-clean:
+lint:
 	-astyle -r "*.hpp" "*.cpp" "*.h"
 	find . -type f -name '*.orig' -delete
-prepare: clear install-hooks update clean clear
+prepare: clear install-hooks update lint clear
 
 # Development related
 install-hooks:
@@ -28,7 +28,9 @@ t-watch: clean-t-watch prepare build-t-watch program-t-watch-data program-t-watc
 
 
 # M5StackC related.
-m5watch:
+clean:
 	#pio run -e m5stackcplus -t clean
+data:
 	pio run -e m5stackcplus -t buildfs -t uploadfs
+m5watch: lint clean data
 	pio run -e m5stackcplus -t upload -t monitor

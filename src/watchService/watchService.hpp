@@ -327,8 +327,8 @@ protected:
     sDOS_RTC *_rtc;
     WiFiManager *_wifi;
     BluetoothManager *_bt;
-    sDOS_OTA_Service *_ota;
     sDOS_CPU_SCALER *_cpuScaler;
+    sDOS_OTA_Service *_ota;
     sDOS_BUTTON *_button;
     sDOS_LED_MONO *_led;
     bool _bleh = false;
