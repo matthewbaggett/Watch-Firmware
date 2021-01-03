@@ -37,18 +37,18 @@ public:
         this->_debugger->Debug(this->_component, "Defining AXP192 InitDef");
 
         sDOS_AXP192_InitDef initDef = {
-                .EXTEN  = true,
-                .BACKUP = true,
-                .DCDC1  = 3300,
-                .DCDC2  = 0,
-                .DCDC3  = 0,
-                .LDO2   = 3000,
-                .LDO3   = 3000,
-                .GPIO0  = 2800,
-                .GPIO1  = -1,
-                .GPIO2  = -1,
-                .GPIO3  = -1,
-                .GPIO4  = -1,
+            .EXTEN  = true,
+            .BACKUP = true,
+            .DCDC1  = 3300,
+            .DCDC2  = 0,
+            .DCDC3  = 0,
+            .LDO2   = 3000,
+            .LDO3   = 3000,
+            .GPIO0  = 2800,
+            .GPIO1  = -1,
+            .GPIO2  = -1,
+            .GPIO3  = -1,
+            .GPIO4  = -1,
         };
 
         this->_debugger->Debug(this->_component, "AXP192 InitDef defined");
