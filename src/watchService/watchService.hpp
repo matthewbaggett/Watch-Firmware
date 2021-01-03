@@ -33,7 +33,7 @@ public:
         Debugger * debugger,
         EventsManager * eventsManager,
         sDOS_FrameBuffer * frameBuffer,
-        sDOS_FAKE_RTC *rtc,
+        sDOS_RTC *rtc,
         WiFiManager *wifi,
         BluetoothManager *bt,
         sDOS_CPU_SCALER *cpuScaler,
@@ -58,14 +58,14 @@ public:
         EventsManager::on(F("cpu_freq_mhz"), &WatchService::cpuFrequencyChange);
         EventsManager::on(F("power_state"), &WatchService::powerStateChange);
 
-        debugger->Debug(_component, "setup begin");
-        paintTime();
-        debugger->Debug(_component, "paintTime");
-        paintTray();
-        debugger->Debug(_component, "paintTray");
+        //debugger->Debug(_component, "setup begin");
+        //paintTime();
+        //debugger->Debug(_component, "paintTime");
+        //paintTray();
+        //debugger->Debug(_component, "paintTray");
 
         // All done
-        debugger->Debug(_component, "setup over");
+        //debugger->Debug(_component, "setup over");
 
         // Allow Debugging with bluetooth UART
         //BluetoothManager::addRequest();

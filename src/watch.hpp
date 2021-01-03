@@ -26,7 +26,8 @@ public:
             _driver_WiFi,
             _driver_BT,
             _cpuScaler,
-            _ota
+            _ota,
+            _axp192
         );
 #endif
 #ifdef HARDWARE_TWATCH
